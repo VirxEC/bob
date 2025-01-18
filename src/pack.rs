@@ -28,8 +28,11 @@ pub fn pack(command: PathCommand) -> anyhow::Result<()> {
 
     if let Some(old_buildinfo) = &command.old_buildinfo {
         if !fs::exists(old_buildinfo)? {
-            return Err(anyhow!("old_buildinfo doesn't exist"));
+            eprintln!("Specified file for old buildinfo doesn't exist");
+            // on first build, this file won't exist
+            return Ok(());
         }
+
         let str_contents = fs::read_to_string(old_buildinfo)?;
         let old_buildinfo: BuildInfo = toml::from_str(&str_contents)?;
 
@@ -45,9 +48,9 @@ pub fn pack(command: PathCommand) -> anyhow::Result<()> {
                 }
             }
         }
-    }
 
-    create_archives(&buildinfo.projects, &command.build_dir, "diff")?;
+        create_archives(&buildinfo.projects, &command.build_dir, "diff")?;
+    }
 
     Ok(())
 }
