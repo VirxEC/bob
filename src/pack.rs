@@ -86,7 +86,7 @@ fn create_archives(projects: &[Project], build_dir: &Path, name: &str) -> anyhow
             a.append_dir_all(format!("{}/{platform}", project.name), platform_dir)
                 .unwrap();
 
-            for entry in fs::read_dir(&project_dir)?.into_iter().flatten() {
+            for entry in fs::read_dir(&project_dir)?.flatten() {
                 let path = entry.path();
                 if path.is_dir() {
                     continue;

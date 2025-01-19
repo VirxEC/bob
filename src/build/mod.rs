@@ -43,15 +43,11 @@ pub fn build(build_command: BuildCommand) -> anyhow::Result<()> {
 
         let proj_build_root_dir = build_command.out_dir.join(&build_config.project_name);
 
-        let prev_project_info = if proj_build_root_dir.exists() {
-            build_info_prev.as_ref().and_then(|x| {
-                x.projects
-                    .iter()
-                    .find(|x| x.name == build_config.project_name)
-            })
-        } else {
-            None
-        };
+        let prev_project_info = build_info_prev.as_ref().and_then(|x| {
+            x.projects
+                .iter()
+                .find(|x| x.name == build_config.project_name)
+        });
 
         let Some(bin_build_result) = bin_builder::build(
             proj_src_root_dir.to_owned(),
@@ -104,10 +100,10 @@ pub fn build(build_command: BuildCommand) -> anyhow::Result<()> {
             "Couldn't build bot tomls for project {}",
             &build_config.project_name
         ))?;
-
-        fs::File::create(build_command.out_dir.join("buildinfo.toml"))?
-            .write_all(build_info.to_string().as_bytes())?;
     }
+
+    fs::File::create(build_command.out_dir.join("buildinfo.toml"))?
+        .write_all(build_info.to_string().as_bytes())?;
 
     info!("Copy of buildinfo.toml:\n{}", build_info.to_string().trim());
     info!("Done!");
