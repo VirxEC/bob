@@ -82,7 +82,15 @@ pub fn build(build_command: BuildCommand) -> anyhow::Result<()> {
         info!("Decompressing built binaries...");
 
         let (windows_binary_path, linux_binary_path) =
-            build_bot_bins(bin_build_result.tar_binary, &proj_build_root_dir)?;
+            match build_bot_bins(bin_build_result.tar_binary, &proj_build_root_dir) {
+                Ok((windows_binary_path, linux_binary_path)) => {
+                    (windows_binary_path, linux_binary_path)
+                }
+                Err(e) => {
+                    eprintln!("Error building binaries: {e}");
+                    continue;
+                }
+            };
 
         build_bot_tomls(
             &build_config
@@ -90,7 +98,7 @@ pub fn build(build_command: BuildCommand) -> anyhow::Result<()> {
                 .iter()
                 .map(|x| proj_src_root_dir.join(x))
                 .collect::<Vec<_>>(),
-            &build_config.project_name,
+            // &build_config.project_name,
             &proj_src_root_dir,
             &proj_build_root_dir,
             windows_binary_path,
@@ -169,7 +177,7 @@ fn build_bot_bins(
 
 fn build_bot_tomls(
     bot_configs: &[PathBuf],
-    proj_name: &str,
+    // proj_name: &str,
     proj_src_root_dir: &Path,
     proj_build_root_dir: &Path,
     windows_binary_path: Option<PathBuf>,
